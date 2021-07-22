@@ -12,7 +12,7 @@ public class InMemoryBookRepository implements IBookRepository {
 
     private Collection<Book> books;
 
-    private InMemoryBookRepository() {
+    public InMemoryBookRepository() {
         this.books = new ArrayList<Book>();
     }
 
