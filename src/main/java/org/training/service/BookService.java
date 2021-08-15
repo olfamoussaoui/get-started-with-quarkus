@@ -32,14 +32,15 @@ public class BookService {
 
     public final BooksRecord saveAll(final Collection<Book> books) {
 
-        final var booksPartition = books
-                .stream()
-                .map(this::isValidBookForSave)
-                .collect(
-                        Collectors.groupingBy(
-                                ValidBookRecord::isValid
-                        )
-                );
+        final var booksPartition =
+                books
+                        .stream()
+                        .map(this::isValidBookForSave)
+                        .collect(
+                                Collectors.partitioningBy(
+                                        ValidBookRecord::isValid
+                                )
+                        );
 
         final var validBooks =
                 booksPartition
@@ -63,7 +64,7 @@ public class BookService {
     }
 
 
-    private final Either<? extends BookException, Book> findOneById(final String id) {
+    final Either<? extends BookException, Book> findOneById(final String id) {
         final var isBookIdValid = isBookIdValid(id);
         if (isBookIdValid.isPresent())
             return Either.left(isBookIdValid.get());
@@ -75,13 +76,13 @@ public class BookService {
 
     }
 
-    private final Collection<Book> findAll() {
+    final Collection<Book> findAll() {
         return
                 this.bookRepository
                         .findAll();
     }
 
-    private final Either<? extends BookException, Book> updateOne(final Book book) {
+    final Either<? extends BookException, Book> updateOne(final Book book) {
         final var isBookValid = isValidBookForUpdate(book);
 
         if (isBookValid.isValid())
@@ -98,7 +99,7 @@ public class BookService {
                                 .orElse(new BookException("Unknown book exception!")));
     }
 
-    private final Either<? extends BookException, Book> deleteOneById(final String id) {
+    final Either<? extends BookException, Book> deleteOneById(final String id) {
         final var isBookIdValid = isBookIdValid(id);
         if (isBookIdValid.isPresent())
             return
@@ -114,7 +115,7 @@ public class BookService {
                                         .left(new BookException.BookNotFoundException("Book not found")));
     }
 
-    private final void deleteAll() {
+    final void deleteAll() {
         this.bookRepository.deleteAll();
     }
 
@@ -131,13 +132,15 @@ public class BookService {
     }
 
     public final Optional<BookException.BookIdEmptyOrNullException> isBookIdValid(final String id) {
-        return (id.isBlank() || Objects.isNull(id))
+        final var idIsEmptyOrNull = Objects.isNull(id) || id.isBlank();
+        return idIsEmptyOrNull
                 ? Optional.ofNullable(new BookException.BookIdEmptyOrNullException("Book id is empty or null"))
                 : Optional.empty();
     }
 
     public final Optional<BookException.BookNameEmptyOrNullException> isBookNameValid(final String name) {
-        return (name.isBlank() || Objects.isNull(name))
+        final var isNameValid = Objects.isNull(name) || name.isBlank();
+        return isNameValid
                 ? Optional.ofNullable(new BookException.BookNameEmptyOrNullException("Book name is empty or null"))
                 : Optional.empty();
     }
@@ -169,7 +172,7 @@ public class BookService {
         if (isBookExist) {
             return
                     ValidBookRecord
-                            .invalid(book, new BookException.BookAlreadyExist("Book already exist!"));
+                            .invalid(book, new BookException.BookAlreadyExistException("Book already exist!"));
         }
 
         return ValidBookRecord.valid(book);
@@ -214,12 +217,12 @@ public class BookService {
     }
 
     @Data
-    private static final class BooksRecord {
+    protected static final class BooksRecord {
         private final Collection<Book> savedBooks;
         private final Collection<UnsavedBooks> unsavedBooks;
 
         @Data
-        private static final class UnsavedBooks {
+        protected static final class UnsavedBooks {
             private final Book book;
             private final BookException reason;
         }
@@ -314,9 +317,9 @@ public class BookService {
             }
         }
 
-        public final static class BookAlreadyExist extends BookException {
+        public final static class BookAlreadyExistException extends BookException {
 
-            public BookAlreadyExist(String message) {
+            public BookAlreadyExistException(String message) {
                 super(message);
             }
         }
