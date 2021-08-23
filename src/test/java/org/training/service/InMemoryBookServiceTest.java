@@ -391,7 +391,7 @@ public class InMemoryBookServiceTest {
 
         Assertions.assertAll(
                 () -> org.hamcrest.MatcherAssert.assertThat(
-                        deletedBook.get(),
+                        deletedBook.getLeft(),
                         org.hamcrest.CoreMatchers.instanceOf(BookService.BookException.BookNotFoundException.class)
                 ),
                 () -> Assertions.assertEquals(1, this.bookService.findAll().size())
@@ -407,7 +407,7 @@ public class InMemoryBookServiceTest {
 
         Assertions.assertAll(
                 () -> org.hamcrest.MatcherAssert.assertThat(
-                        deletedBook.get(),
+                        deletedBook.getLeft(),
                         org.hamcrest.CoreMatchers.instanceOf(BookService.BookException.BookIdEmptyOrNullException.class)
                 ),
                 () -> Assertions.assertEquals(1, this.bookService.findAll().size())
@@ -423,7 +423,7 @@ public class InMemoryBookServiceTest {
 
         Assertions.assertAll(
                 () -> org.hamcrest.MatcherAssert.assertThat(
-                        deletedBook.get(),
+                        deletedBook.getLeft(),
                         org.hamcrest.CoreMatchers.instanceOf(BookService.BookException.BookIdEmptyOrNullException.class)
                 ),
                 () -> Assertions.assertEquals(1, this.bookService.findAll().size())

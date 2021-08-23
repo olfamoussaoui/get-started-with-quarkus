@@ -64,7 +64,7 @@ public class BookService {
     }
 
 
-    final Either<? extends BookException, Book> findOneById(final String id) {
+    public final Either<? extends BookException, Book> findOneById(final String id) {
         final var isBookIdValid = isBookIdValid(id);
         if (isBookIdValid.isPresent())
             return Either.left(isBookIdValid.get());
@@ -76,13 +76,13 @@ public class BookService {
 
     }
 
-    final Collection<Book> findAll() {
+    public final Collection<Book> findAll() {
         return
                 this.bookRepository
                         .findAll();
     }
 
-    final Either<? extends BookException, Book> updateOne(final Book book) {
+    public final Either<? extends BookException, Book> updateOne(final Book book) {
         final var isBookValid = isValidBookForUpdate(book);
 
         if (isBookValid.isValid())
@@ -99,7 +99,7 @@ public class BookService {
                                 .orElse(new BookException("Unknown book exception!")));
     }
 
-    final Either<? extends BookException, Book> deleteOneById(final String id) {
+    public final Either<? extends BookException, Book> deleteOneById(final String id) {
         final var isBookIdValid = isBookIdValid(id);
         if (isBookIdValid.isPresent())
             return
@@ -108,14 +108,14 @@ public class BookService {
 
         return
                 this.bookRepository
-                        .findOneById(id)
+                        .deleteOneById(id)
                         .<Either<? extends BookException, Book>>map(Either::right)
                         .orElse(
                                 Either
                                         .left(new BookException.BookNotFoundException("Book not found")));
     }
 
-    final void deleteAll() {
+    public final void deleteAll() {
         this.bookRepository.deleteAll();
     }
 
@@ -217,12 +217,12 @@ public class BookService {
     }
 
     @Data
-    protected static final class BooksRecord {
+    public static final class BooksRecord {
         private final Collection<Book> savedBooks;
         private final Collection<UnsavedBooks> unsavedBooks;
 
         @Data
-        protected static final class UnsavedBooks {
+        public static final class UnsavedBooks {
             private final Book book;
             private final BookException reason;
         }
